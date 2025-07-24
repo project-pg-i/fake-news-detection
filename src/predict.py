@@ -1,16 +1,32 @@
-import joblib
+# src/predict.py
 
-# Load saved model and vectorizer
+import joblib
+import re
+import string
+
+def clean(text):
+    # Match your train.py cleaning as closely as possible
+    text = text.lower()
+    text = re.sub(r"http\S+", "", text)  # remove URLs
+    text = re.sub(r"[^\w\s]", "", text)  # remove punctuation
+    text = re.sub(r"\d+", "", text)      # remove numbers
+    text = text.translate(str.maketrans("", "", string.punctuation))  # another punctuation cleaner
+    text = text.strip()
+    return text
+
+# Load model & vectorizer
 model = joblib.load("models/logistic_model.pkl")
 vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
 
-def predict_news(text):
-    vector = vectorizer.transform([text])
-    prediction = model.predict(vector)[0]
-    return "REAL" if prediction == 1 else "FAKE"
+# Input
+text = input("Enter a news article to check if it's real or fake:\n")
 
-# Example usage
-if __name__ == "__main__":
-    user_input = input("Enter a news article to check if it's real or fake:\n")
-    result = predict_news(user_input)
-    print("\nPrediction:", result)
+# Clean + vectorize
+cleaned_text = clean(text)
+vectorized = vectorizer.transform([cleaned_text])
+
+# Predict
+pred = model.predict(vectorized)[0]
+label = "REAL" if pred == 1 else "FAKE"
+
+print(f"\n🧠 Prediction: {label}")
