@@ -1,4 +1,4 @@
 pandas
 scikit-learn
 joblib
-streamlit  # Only if using a web app
+streamlit
